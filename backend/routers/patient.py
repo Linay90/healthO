@@ -10,7 +10,7 @@ router=APIRouter(
     prefix="/patients",
     tags=["patients"]
 )
-@router.get("",response_model=list[PatientResponse])
+@router.get("/",response_model=list[PatientResponse])
 def get_patients():
     return patients
 
@@ -23,7 +23,7 @@ def create_patient(patient:PatientCreate):
     }
     patients.append(new_patient)
     return new_patient
-
+#Path Parameter
 @router.get("/{patient_id}",response_model=PatientResponse)
 def get_patient(patient_id:int):
     for patient in patients:
@@ -33,6 +33,41 @@ def get_patient(patient_id:int):
         status_code=404,
         detail="Patient not found"
     )
+
+
+#Query parameter
+@router.get("")
+def get_patients_byage(age:int| None=None):
+    if age is None:
+        return patients
+    filtered_patients=[]
+    for patient in patients:
+        if patient["age"]== age:
+            filtered_patients.append(patient)
+    return filtered_patients
+
+
+#Query parameter -multiple
+@router.get("",response_model=list[PatientResponse])
+def get_patient_multiple_parameters(
+    first_name:str | None=None,
+    email:str | None=None,
+    age:int |None=None
+):
+    filtered_patinets=[]
+    for patient in patients:
+        if first_name is not None and patient[first_name]!=first_name:
+            continue
+        if email is not None and patient["email"] != email:
+            continue
+
+        if age is not None and patient["age"] != age:
+            continue
+
+        filtered_patinets.append(patient)
+
+    return filtered_patinets
+
 
 @router.put("/{patient_id}",response_model=PatientResponse)
 def update_patient(patient_id:int,patient:PatientCreate):
