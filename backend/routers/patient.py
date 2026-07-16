@@ -14,6 +14,19 @@ router=APIRouter(
 def get_patients():
     return patients
 
+
+#pagination
+@router.get("/",response_model=list[PatientResponse])
+def get_patients_pag(
+    page:int =1,
+    limit:int =5,
+    sort_by :str | None=None,
+    order:str="asc"
+):
+    start=(page-1)*limit
+    end=start+limit
+    return patients[start:end]
+
 @router.post("",response_model=PatientResponse)
 def create_patient(patient:PatientCreate):
     new_patient={
@@ -36,7 +49,7 @@ def get_patient(patient_id:int):
 
 
 #Query parameter
-@router.get("")
+@router.get("/")
 def get_patients_byage(age:int| None=None):
     if age is None:
         return patients
